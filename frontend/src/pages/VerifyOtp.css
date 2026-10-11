@@ -1,0 +1,273 @@
+/* =========================
+   PAGE
+========================= */
+
+.otp-page {
+    width: 100%;
+    min-height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 28px;
+
+    box-sizing: border-box;
+
+    background: #fff8e8;
+}
+
+
+/* =========================
+   CARD
+========================= */
+
+.otp-card {
+    position: relative;
+
+    width: 90%;
+    max-width: 520px;
+
+    padding: 46px 48px;
+
+    box-sizing: border-box;
+
+    background: #ffffff;
+
+    border-radius: 26px;
+
+    box-shadow:
+        0 20px 60px rgba(70, 55, 25, 0.10);
+}
+
+
+/* =========================
+   BACK BUTTON
+========================= */
+
+.otp-back-button {
+    width: 46px;
+    height: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 28px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #fafafa;
+
+    color: #222;
+
+    font-size: 28px;
+    font-weight: 300;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.otp-back-button:hover {
+    background: #f3f1ed;
+
+    transform: translateX(-2px);
+}
+
+
+/* =========================
+   HEADING
+========================= */
+
+.otp-heading {
+    margin-bottom: 42px;
+}
+
+.otp-heading h1 {
+    margin: 0 0 20px;
+
+    color: #222;
+
+    font-family: Georgia, serif;
+
+    font-size: 42px;
+    line-height: 1;
+
+    letter-spacing: -1.8px;
+}
+
+.otp-heading p {
+    max-width: 440px;
+
+    margin: 0;
+
+    color: #444;
+
+    font-size: 15px;
+    line-height: 1.45;
+}
+
+.otp-heading strong {
+    display: block;
+
+    color: #292621;
+
+    font-weight: 600;
+}
+
+
+/* =========================
+   OTP SECTION
+========================= */
+
+.otp-section {
+    margin-bottom: 34px;
+}
+
+.otp-section h2 {
+    margin: 0 0 18px;
+
+    color: #292621;
+
+    font-family: Georgia, serif;
+
+    font-size: 18px;
+
+    letter-spacing: -0.4px;
+}
+
+
+/* =========================
+   OTP INPUTS
+========================= */
+
+.otp-inputs {
+    display: flex;
+    gap: 10px;
+}
+
+.otp-input {
+    width: 60px;
+    height: 68px;
+
+    padding: 0;
+    box-sizing: border-box;
+
+    border: 1px solid #ddd9d1;
+    border-radius: 15px;
+
+    outline: none;
+
+    background: #ffffff;
+
+    color: #222;
+
+    font-family: inherit;
+    font-size: 30px;
+    font-weight: 600;
+
+    text-align: center;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.otp-input:focus {
+    border-color: #f1b53f;
+
+    box-shadow:
+        0 0 0 3px rgba(255, 200, 77, 0.14);
+}
+
+
+/* =========================
+   VALIDITY
+========================= */
+
+.otp-validity {
+    margin: 20px 0 0;
+
+    color: #555;
+
+    font-size: 15px;
+}
+
+
+/* =========================
+   VERIFY BUTTON
+========================= */
+
+.verify-otp-btn {
+    width: 100%;
+    height: 54px;
+
+    border: none;
+    border-radius: 13px;
+
+    background: #ffc84d;
+
+    color: #202020;
+
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 8px 18px rgba(255, 190, 55, 0.20);
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease;
+}
+
+.verify-otp-btn:hover {
+    background: #ffbe35;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 600px) {
+
+    .otp-page {
+        padding: 16px;
+    }
+
+    .otp-card {
+        padding: 34px 24px;
+
+        border-radius: 22px;
+    }
+
+    .otp-heading h1 {
+        font-size: 42px;
+    }
+
+    .otp-heading p {
+        font-size: 16px;
+    }
+
+    .otp-inputs {
+        gap: 9px;
+    }
+
+    .otp-input {
+        width: 62px;
+        height: 62px;
+
+        font-size: 28px;
+    }
+}

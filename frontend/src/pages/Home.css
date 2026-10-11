@@ -1,0 +1,8 @@
+.home-page {
+    min-height: 100vh;
+    background: #ffffff;
+}
+
+.home-page main {
+    padding-bottom: 60px;
+}

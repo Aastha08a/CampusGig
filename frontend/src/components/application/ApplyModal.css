@@ -1,0 +1,183 @@
+/* =========================
+   APPLY MODAL
+========================= */
+
+.apply-modal-overlay {
+    position: fixed;
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 24px;
+
+    background: rgba(0, 0, 0, 0.35);
+
+    z-index: 1000;
+}
+
+
+.apply-modal {
+    width: 100%;
+    max-width: 560px;
+
+    padding: 30px;
+
+    background: #ffffff;
+
+    border: 1px solid #e8e3dc;
+    border-radius: 20px;
+
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+
+    box-sizing: border-box;
+}
+
+
+.apply-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    margin-bottom: 8px;
+}
+
+
+.apply-modal-label {
+    display: block;
+
+    margin-bottom: 6px;
+
+    font-size: 13px;
+    color: #999;
+}
+
+
+.apply-modal-header h2 {
+    margin: 0;
+
+    font-size: 24px;
+    line-height: 1.25;
+
+    color: #222;
+}
+
+
+.apply-modal-close {
+    border: none;
+    background: transparent;
+
+    padding: 2px 6px;
+
+    font-size: 28px;
+    line-height: 1;
+
+    color: #777;
+
+    cursor: pointer;
+}
+
+
+.apply-modal-close:hover {
+    color: #222;
+}
+
+
+.apply-modal .form-field {
+    margin-top: 24px;
+}
+
+
+.apply-modal .form-field label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    color: #333;
+}
+
+
+.apply-modal textarea {
+    width: 100%;
+    min-height: 150px;
+
+    padding: 14px 16px;
+
+    box-sizing: border-box;
+
+    resize: vertical;
+
+    border: 1px solid #ddd6ce;
+    border-radius: 12px;
+
+    background: #fff;
+
+    font-family: inherit;
+    font-size: 14px;
+    color: #333;
+
+    outline: none;
+}
+
+
+.apply-modal textarea:focus {
+    border-color: #ffcb56;
+}
+
+
+.apply-modal textarea::placeholder {
+    color: #aaa;
+}
+
+
+.apply-modal .form-error {
+    margin: 8px 0 0;
+
+    font-size: 13px;
+    color: #d9534f;
+}
+
+
+.apply-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+
+    margin-top: 24px;
+}
+
+.apply-modal-actions .secondary-button {
+    min-width: 90px;
+
+    padding: 11px 18px;
+
+    border: 1px solid #ddd6ce;
+    border-radius: 10px;
+
+    background: #fffaf0;
+
+    color: #555;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+.apply-modal-actions .secondary-button:hover {
+    background: #fff3d2;
+    border-color: #ffcb56;
+    color: #333;
+}
+
+.apply-modal-actions .secondary-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

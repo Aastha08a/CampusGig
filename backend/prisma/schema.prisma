@@ -1,0 +1,186 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String   @id @default(uuid())
+  name          String
+  email         String   @unique
+  password_hash String
+  bio           String?
+
+  university    String   @default("Chitkara University")
+  stream        String?
+  year          Int?
+  city          String?
+
+  is_verified   Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  otp_code      String?
+  otp_expires_at DateTime?
+
+  skills          UserSkill[]
+  gigs            Gig[]
+  applications    Application[]
+  givenRatings    Rating[] @relation("GivenRatings")
+  receivedRatings Rating[] @relation("ReceivedRatings")
+  reportsCreated  Report[]
+  reportsReceived Report[] @relation("ReportedUser")
+  notifications  Notification[]
+}
+
+model Skill {
+  id   String @id @default(uuid())
+  name String @unique
+
+  users UserSkill[]
+  gigs GigSkill[]
+}
+
+model UserSkill {
+  userId  String
+  skillId String
+
+  user  User  @relation(fields: [userId], references: [id])
+  skill Skill @relation(fields: [skillId], references: [id])
+
+  @@id([userId, skillId])
+}
+
+model Gig {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  budget      Float
+
+  category    GigCategory?
+  dueDate     DateTime?
+  workMode    GigWorkMode?
+  whatYoullDo String?
+  duration    String?
+
+  status      GigStatus @default(OPEN)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  postedById String
+  postedBy   User @relation(fields: [postedById], references: [id])
+
+  skills       GigSkill[]
+  applications Application[]
+  ratings      Rating[]
+  reports      Report[]
+}
+
+enum GigCategory {
+  DESIGN
+  CODING
+  CONTENT
+  EVENTS
+  TUTORING
+  MARKETING
+  OTHER
+}
+
+enum GigWorkMode {
+  ONLINE
+  ON_CAMPUS
+  HYBRID
+}
+
+model GigSkill {
+  gigId   String
+  skillId String
+
+  gig   Gig   @relation(fields: [gigId], references: [id])
+  skill Skill @relation(fields: [skillId], references: [id])
+
+  @@id([gigId, skillId])
+}
+
+enum GigStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model Application {
+  id        String            @id @default(uuid())
+  message   String?
+  status    ApplicationStatus @default(PENDING)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  applicantId String
+  gigId       String
+
+  applicant User @relation(fields: [applicantId], references: [id])
+  gig       Gig  @relation(fields: [gigId], references: [id])
+
+  @@unique([applicantId, gigId])
+}
+
+enum ApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model Rating {
+  id        String   @id @default(uuid())
+  score     Int
+  review    String?
+  createdAt DateTime @default(now())
+
+  raterId  String
+  ratedId  String
+  gigId    String
+
+  rater  User @relation("GivenRatings", fields: [raterId], references: [id])
+  rated  User @relation("ReceivedRatings", fields: [ratedId], references: [id])
+  gig    Gig  @relation(fields: [gigId], references: [id])
+
+  @@unique([raterId, ratedId, gigId])
+}
+
+model Report {
+  id        String       @id @default(uuid())
+  reason    String
+  details   String?
+  status    ReportStatus @default(PENDING)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  reporterId String
+  reporter   User @relation(fields: [reporterId], references: [id])
+
+  reportedUserId String?
+  reportedUser   User? @relation("ReportedUser", fields: [reportedUserId], references: [id])
+
+  reportedGigId String?
+  reportedGig   Gig? @relation(fields: [reportedGigId], references: [id])
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWED
+  RESOLVED
+  DISMISSED
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User @relation(fields: [userId], references: [id])
+}

@@ -1,0 +1,168 @@
+.navbar {
+    height: 68px;
+    padding: 0 72px;
+    background: #ffffff;
+    border-bottom: 1px solid #f1eee8;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+}
+
+.navbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: #292621;
+    text-decoration: none;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.logo-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    background: #ffcb56;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #292621;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.navbar-links {
+    display: flex;
+    align-items: center;
+    gap: 34px;
+}
+
+.navbar-links a {
+    position: relative;
+    color: #68645d;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 25px 0 23px;
+}
+
+.navbar-links a:hover {
+    color: #292621;
+}
+
+.navbar-links a.active {
+    color: #292621;
+}
+
+.navbar-links a.active::after {
+    content: '';
+    position: absolute;
+    bottom: 17px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    border-radius: 2px;
+    background: #ff7e7e;
+}
+
+.navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.icon-button,
+.profile-button {
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.icon-button {
+    width: 102px;
+    height: 38px;
+    border: none;
+    border-radius: 20px;
+    background: #ffebbe;
+    color: #292621;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.icon-button:hover {
+    background: #ffd061;
+    color: #000000;
+    /* transform: translateY(-1px); */
+}
+
+.profile-button {
+    background: transparent;
+    padding: 0;
+}
+
+.profile-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #ffcb56;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #292621;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.profile-avatar:hover {
+    background: #ffb300;
+    /* transform: translateY(-1px); */
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 9px 16px;
+
+    background: #ffcb56;
+    border: none;
+    width: 39px;
+    height: 36px;
+    border-radius: 50%;
+
+    color: #2f2d2a;
+    font-family: inherit;
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.logout-btn svg {
+    color: #000000;
+    transform: translateX(-2px);
+}
+
+.logout-btn:hover {
+    background: #ffb300;
+}
+
+@media (max-width: 800px) {
+    .navbar {
+        padding: 0 24px;
+    }
+
+    .navbar-links {
+        display: none;
+    }
+}
