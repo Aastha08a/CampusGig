@@ -4,17 +4,19 @@
 
 .signup-page {
     width: 100%;
-    height: 100vh;
+    min-height: 100vh;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
     padding: 32px;
+    box-sizing: border-box;
 
     background: #fff8e8;
 
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 
@@ -26,9 +28,9 @@
     width: 90%;
     max-width: 1080px;
 
-    height: calc(100vh - 64px);
-    max-height: 680px;
-    min-height: 560px;
+    height: min(680px, calc(100vh - 48px));
+    min-height: 0;
+    max-height: none;
 
     display: grid;
     grid-template-columns: 48% 52%;
@@ -36,13 +38,11 @@
     overflow: hidden;
 
     border-radius: 28px;
-
     background: #ffffff;
 
     box-shadow:
         0 20px 60px rgba(70, 55, 25, 0.10);
 }
-
 
 /* =========================
    LEFT SIDE
@@ -203,7 +203,8 @@
     align-items: center;
     justify-content: center;
 
-    padding: 40px 60px;
+    padding: 24px 50px;
+    box-sizing: border-box;
 
     background: #ffffff;
 
@@ -221,13 +222,13 @@
 ========================= */
 
 .signup-heading {
-    margin-bottom: 10px;
+    margin-bottom: 6px;
 }
 
 .signup-heading>span {
     display: block;
 
-    margin-bottom: 12px;
+    margin-bottom: 6px;
 
     color: #e38a31;
 
@@ -267,14 +268,14 @@
     display: flex;
     flex-direction: column;
 
-    gap: 14px;
+    gap: 10px;
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
 
-    gap: 8px;
+    gap: 5px;
 }
 
 .form-group label {
@@ -290,7 +291,7 @@
 .form-group input,
 .form-group select {
     width: 100%;
-    height: 48px;
+    height: 44px;
 
     padding: 0 16px;
 
@@ -430,7 +431,7 @@
 ========================= */
 
 .signup-login-link {
-    margin: 23px 0 0;
+    margin: 12px 0 0;
 
     text-align: center;
 
@@ -446,13 +447,27 @@
    RESPONSIVE
 ========================= */
 
-@media (max-width: 850px) {
-
+/* TABLET + DESKTOP */
+@media (min-width: 651px) {
     .signup-page {
-        padding: 25px;
+        height: 100vh;
+        min-height: 0;
+        padding: 24px;
+        overflow: hidden;
+        box-sizing: border-box;
     }
 
     .signup-container {
+        height: min(680px, 100%);
+        max-height: 100%;
+        min-height: 0;
+    }
+}
+
+/* TABLET */
+@media (min-width: 651px) and (max-width: 850px) {
+    .signup-container {
+        width: 100%;
         grid-template-columns: 44% 56%;
     }
 
@@ -465,28 +480,27 @@
     }
 
     .signup-form-section {
-        padding: 35px;
+        padding: 24px;
     }
 }
 
-
+/* MOBILE */
 @media (max-width: 650px) {
-
     .signup-page {
-        height: 100vh;
-
+        min-height: 100vh;
+        height: auto;
         padding: 20px;
-
+        align-items: center;
+        justify-content: center;
+        overflow-x: hidden;
         overflow-y: auto;
     }
 
     .signup-container {
+        width: 100%;
+        min-height: 0;
         height: auto;
-
-        min-height: calc(100vh - 40px);
-
         grid-template-columns: 1fr;
-
         border-radius: 22px;
     }
 
@@ -495,9 +509,10 @@
     }
 
     .signup-form-section {
-        min-height: calc(100vh - 40px);
-
+        min-height: 0;
+        height: auto;
         padding: 35px 25px;
+        box-sizing: border-box;
     }
 
     .signup-heading h2 {
@@ -506,7 +521,6 @@
 
     .form-row {
         grid-template-columns: 1fr;
-
         gap: 20px;
     }
 }

@@ -493,21 +493,26 @@
 }
 
 
+
 @media (max-width: 650px) {
-
     .login-page {
-        height: 100vh;
+        min-height: 100vh;
+        height: auto;
         padding: 20px;
-
+        box-sizing: border-box;
+        align-items: center;
+        justify-content: center;
+        overflow-x: hidden;
         overflow-y: auto;
     }
 
     .login-container {
+        width: 100%;
         height: auto;
-        min-height: calc(100vh - 40px);
+        min-height: 0;
+        max-height: none;
 
         grid-template-columns: 1fr;
-
         border-radius: 22px;
     }
 
@@ -516,12 +521,34 @@
     }
 
     .login-form-section {
-        min-height: calc(100vh - 40px);
-
+        min-height: 0;
+        height: auto;
         padding: 35px 25px;
+        box-sizing: border-box;
+    }
+
+    .login-form-container {
+        width: 100%;
+        max-width: 440px;
+    }
+
+    .login-heading {
+        margin-bottom: 20px;
     }
 
     .login-heading h2 {
         font-size: 30px;
+    }
+
+    .login-form {
+        gap: 16px;
+    }
+
+    .login-divider {
+        margin: 18px 0;
+    }
+
+    .signup-text {
+        margin-top: 18px;
     }
 }
