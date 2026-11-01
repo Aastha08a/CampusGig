@@ -67,7 +67,7 @@ function Navbar() {
                     </NavLink>
 
                     <NavLink
-                        to="/applications"
+                        to="/my-applications"
                         className={({ isActive }) =>
                             isActive ? 'active' : ''
                         }

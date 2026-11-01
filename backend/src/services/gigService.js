@@ -11,12 +11,18 @@ async function createGig(userId, data) {
     whatYoullDo,
     duration,
     skillIds,
+    spots = 1,
   } = data;
 
   if (!title || !description || budget === undefined) {
     throw new Error(
       "Title, description, and budget are required."
     );
+  }
+
+  if (!Number.isInteger(Number(spots)) ||
+    Number(spots) < 1) {
+    throw new Error("Spots must be a positive integer.");
   }
 
   if (skillIds !== undefined && !Array.isArray(skillIds)) {
@@ -65,6 +71,7 @@ async function createGig(userId, data) {
             },
           })) || [],
       },
+      spots: Number(spots),
     },
 
     include: {
@@ -339,37 +346,15 @@ async function updateGig(gigId, userId, data) {
     updateData.status = data.status;
   }
 
-  if (data.skillIds !== undefined) {
-    if (!Array.isArray(data.skillIds)) {
-      throw new Error("skillIds must be an array.");
+  if (data.spots !== undefined) {
+    if (
+      !Number.isInteger(Number(data.spots)) ||
+      Number(data.spots) < 1
+    ) {
+      throw new Error("Spots must be a positive integer.");
     }
 
-    const skills = await prisma.skill.findMany({
-      where: {
-        id: {
-          in: data.skillIds,
-        },
-      },
-    });
-
-    if (skills.length !== data.skillIds.length) {
-      throw new Error("One or more skill IDs are invalid.");
-    }
-
-    await prisma.gigSkill.deleteMany({
-      where: {
-        gigId,
-      },
-    });
-
-    await prisma.gigSkill.createMany({
-      data: data.skillIds.map((skillId) => ({
-        gigId,
-        skillId,
-      })),
-
-      skipDuplicates: true,
-    });
+    updateData.spots = Number(data.spots);
   }
 
   const updatedGig = await prisma.gig.update({

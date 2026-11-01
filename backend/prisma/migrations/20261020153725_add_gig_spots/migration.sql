@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Gig" ADD COLUMN     "spots" INTEGER NOT NULL DEFAULT 1;

@@ -83,6 +83,7 @@ function GigForm({
     const [dueDate, setDueDate] = useState('');
     const [workMode, setWorkMode] = useState('');
     const [duration, setDuration] = useState('');
+    const [spots, setSpots] = useState('1');
 
     const [skills, setSkills] = useState([]);
     const [skillIds, setSkillIds] = useState([]);
@@ -121,6 +122,7 @@ function GigForm({
         setBudget(initialData.budget ?? '');
         setWorkMode(initialData.workMode || '');
         setDuration(initialData.duration || '');
+        setSpots(String(initialData.spots ?? 1));
 
         if (initialData.dueDate) {
             setDueDate(
@@ -177,6 +179,15 @@ function GigForm({
             return;
         }
 
+        if (
+            spots === '' ||
+            !Number.isInteger(Number(spots)) ||
+            Number(spots) < 1
+        ) {
+            setError('Please enter at least 1 person.');
+            return;
+        }
+
         try {
             setLoading(true);
 
@@ -190,6 +201,7 @@ function GigForm({
                 workMode: workMode || null,
                 duration: duration.trim() || null,
                 skillIds,
+                spots: Number(spots),
             });
         } catch (error) {
             setError(
@@ -502,6 +514,28 @@ function GigForm({
 
                     </div>
 
+                </div>
+
+
+                <div className="gig-form-field">
+                    <label htmlFor="gig-spots">
+                        Number of people needed
+                        <span className="required-star">*</span>
+                    </label>
+
+                    <input
+                        id="gig-spots"
+                        type="number"
+                        min="1"
+                        step="1"
+                        value={spots}
+                        onChange={(e) => setSpots(e.target.value)}
+                        placeholder="e.g. 2"
+                    />
+
+                    <span className="skill-helper">
+                        How many people do you want to hire for this gig?
+                    </span>
                 </div>
 
 

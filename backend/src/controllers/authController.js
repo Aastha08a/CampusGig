@@ -1,13 +1,22 @@
-const { signup, verifyOtp, login } = require("../services/authService");
-
 const {
   verifyRefreshToken,
   generateAccessToken,
 } = require("../utils/jwt");
 
 const {
+  signup,
+  verifyOtp,
+  login,
+  forgotPassword,
+  resetPassword,
+  googleLogin,
+} = require("../services/authService");
+
+const {
   signupSchema,
   verifyOtpSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
 } = require("../utils/validation");
 
 async function signupController(req, res) {
@@ -131,10 +140,92 @@ async function logoutController(req, res) {
   });
 }
 
+async function forgotPasswordController(req, res) {
+  try {
+    const { email } = forgotPasswordSchema.parse(req.body);
+    const result = await forgotPassword(email);
+
+    res.status(200).json(result);
+  } catch (error) {
+    if (error.name === "ZodError") {
+      return res.status(400).json({
+        message: "Please enter a valid email address.",
+      });
+    }
+
+    res.status(500).json({
+      message: "Unable to process your request right now.",
+    });
+  }
+}
+
+async function resetPasswordController(req, res) {
+  try {
+    const data = resetPasswordSchema.parse(req.body);
+
+    const result = await resetPassword(
+      data.email,
+      data.otp,
+      data.newPassword
+    );
+
+    res.status(200).json(result);
+  } catch (error) {
+    if (error.name === "ZodError") {
+      return res.status(400).json({
+        message: "Invalid reset details.",
+        errors: error.issues.map((issue) => ({
+          field: issue.path[0],
+          message: issue.message,
+        })),
+      });
+    }
+
+    res.status(400).json({
+      message: error.message || "Password reset failed.",
+    });
+  }
+}
+
+async function googleLoginController(req, res) {
+  try {
+    const { credential } = req.body;
+
+    if (!credential) {
+      return res.status(400).json({
+        message: "Google credential is required.",
+      });
+    }
+
+    const result = await googleLogin(credential);
+
+    res.cookie("refreshToken", result.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({
+      message: "Google login successful.",
+      accessToken: result.accessToken,
+      user: result.user,
+    });
+  } catch (error) {
+    res.status(401).json({
+      message: error.message || "Google login failed.",
+    });
+  }
+}
+
 module.exports = {
   signupController,
   verifyOtpController,
   loginController,
+  googleLoginController,
+  forgotPasswordController,
+  resetPasswordController,
+
   refreshTokenController,
   logoutController,
 };

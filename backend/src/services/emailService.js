@@ -17,6 +17,16 @@ async function sendOtpEmail(email, otp) {
   });
 }
 
+async function sendPasswordResetOtpEmail(email, otp) {
+  await transporter.sendMail({
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: "CampusGig Password Reset",
+    text: `Your CampusGig password reset code is ${otp}. It expires in 10 minutes. If you did not request this, ignore this email.`,
+  });
+}
+
 module.exports = {
   sendOtpEmail,
+  sendPasswordResetOtpEmail,
 };

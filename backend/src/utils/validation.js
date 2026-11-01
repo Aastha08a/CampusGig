@@ -47,9 +47,21 @@ const verifyOtpSchema = z.object({
 
 });
 
-module.exports = {
+const forgotPasswordSchema = z.object({
+  email: z.string().trim().email("Please enter a valid email address"),
+});
 
+const resetPasswordSchema = z.object({
+  email: z.string().trim().email("Please enter a valid email address"),
+  otp: z.string().regex(/^\d{6}$/, "OTP must be exactly 6 digits"),
+  newPassword: z.string().min(8, "Password must be at least 8 characters long"),
+});
+
+module.exports = {
+  
   signupSchema,
   verifyOtpSchema,
 
+  forgotPasswordSchema,
+  resetPasswordSchema,
 };

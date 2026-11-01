@@ -82,8 +82,60 @@ export async function verifyOtp(verificationData) {
   return data;
 }
 
+
+/**
+ * Request a password reset OTP
+ */
+export async function forgotPassword(email) {
+  const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      email: email.trim(),
+    }),
+  });
+
+  const data = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    throw new Error(data?.message || 'Failed to request password reset.');
+  }
+
+  return data;
+}
+
+/**
+ * Reset password using OTP
+ */
+export async function resetPassword(resetData) {
+  const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      email: resetData.email.trim(),
+      otp: resetData.otp,
+      newPassword: resetData.newPassword,
+    }),
+  });
+
+  const data = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    throw new Error(data?.message || 'Failed to reset password.');
+  }
+
+  return data;
+}
+
+
 export default {
   loginUser,
   signupUser,
   verifyOtp,
+  forgotPassword,
+  resetPassword,
 };

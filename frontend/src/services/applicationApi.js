@@ -17,6 +17,23 @@ export async function getMyApplications() {
     return response.data;
 }
 
+export async function getGigApplications(gigId) {
+    const response = await api.get(
+        `/gigs/${gigId}/applications`
+    );
+
+    return response.data;
+}
+
+export async function updateApplicationStatus(applicationId, status) {
+    const response = await api.patch(
+        `/applications/${applicationId}`,
+        { status }
+    );
+
+    return response.data;
+}
+
 export async function withdrawApplication(applicationId) {
     const response = await api.delete(
         `/applications/${applicationId}`

@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 
 import Navbar from '../components/home/Navbar';
 
+import { useAuth } from '../context/AuthContext';
+
 import GigCard from '../components/gig/GigCard';
 import GigFilters from '../components/gig/GigFilters';
 
@@ -15,6 +17,7 @@ function BrowseGigsPage() {
     const [gigs, setGigs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const { loading: authLoading, accessToken } = useAuth();
 
     const [searchParams] = useSearchParams();
 
@@ -29,7 +32,15 @@ function BrowseGigsPage() {
     });
 
     useEffect(() => {
+        if (authLoading) return;
+
         async function loadGigs() {
+            if (!accessToken) {
+                setError('Your session has expired. Please log in again.');
+                setLoading(false);
+                return;
+            }
+
             try {
                 setLoading(true);
                 setError('');
@@ -41,7 +52,6 @@ function BrowseGigsPage() {
                 );
 
                 const data = await getAllGigs(cleanFilters);
-
                 setGigs(data);
             } catch (error) {
                 setError(
@@ -54,7 +64,7 @@ function BrowseGigsPage() {
         }
 
         loadGigs();
-    }, [filters]);
+    }, [filters, authLoading, accessToken]);
 
     function handleReset() {
         setFilters({

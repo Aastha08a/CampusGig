@@ -8,6 +8,8 @@ import './gigDetail.css';
 
 import ApplyModal from '../components/application/ApplyModal';
 
+import { useAuth } from '../context/AuthContext';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import {
@@ -23,6 +25,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 import { faCalendar } from '@fortawesome/free-regular-svg-icons';
+
+import { getMyApplications } from '../services/applicationApi';
 
 const categoryLabels = {
     DESIGN: 'Design',
@@ -92,11 +96,15 @@ function getStatusClass(status) {
 function GigDetailPage() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { user } = useAuth();
 
     const [gig, setGig] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [showApplyModal, setShowApplyModal] = useState(false);
+
+    const [hasApplied, setHasApplied] = useState(false);
+    const [checkingApplication, setCheckingApplication] = useState(true);   
 
     useEffect(() => {
         async function loadGig() {
@@ -115,6 +123,53 @@ function GigDetailPage() {
 
         loadGig();
     }, [id]);
+
+
+    useEffect(() => {
+        let cancelled = false;
+
+        async function checkApplicationStatus() {
+            setCheckingApplication(true);
+
+            try {
+                const data = await getMyApplications();
+
+                const applications = Array.isArray(data)
+                    ? data
+                    : data?.applications ?? data?.data ?? [];
+
+                const alreadyApplied = applications.some((application) => {
+                    const applicationGigId =
+                        application.gigId ??
+                        application.gig?.id ??
+                        application.gig_id;
+
+                    return String(applicationGigId) === String(id);
+                });
+
+                if (!cancelled) {
+                    setHasApplied(alreadyApplied);
+                }
+            } catch (error) {
+                console.error('Failed to check application status:', error);
+
+                if (!cancelled) {
+                    setHasApplied(false);
+                }
+            } finally {
+                if (!cancelled) {
+                    setCheckingApplication(false);
+                }
+            }
+        }
+
+        checkApplicationStatus();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [id]);
+
 
     if (loading) {
         return (
@@ -162,6 +217,8 @@ function GigDetailPage() {
 
     const applicantCount =
         gig._count?.applications || 0;
+    
+    const isOwner = user?.id === gig.postedBy?.id;
 
     const skills =
         gig.skills?.map(
@@ -426,20 +483,37 @@ function GigDetailPage() {
                             </div>
 
 
-                            <button
-                                className="gig-dark-button gig-detail-apply-button"
-                                disabled={
-                                    isCancelled ||
-                                    gig.status !== 'OPEN'
-                                }
-                                onClick={() => setShowApplyModal(true)}
-                            >
-                                {isCancelled
-                                    ? 'Gig Cancelled'
-                                    : gig.status === 'OPEN'
-                                    ? 'Apply Now'
-                                    : gig.status}
-                            </button>
+                            
+                            {isOwner ? (
+                                <button
+                                    className="gig-dark-button gig-detail-apply-button"
+                                    onClick={() => navigate(`/gigs/${gig.id}/applications`)}
+                                >
+                                    View Applications ({applicantCount})
+                                </button>
+                            ) : (
+                                <button
+                                    className="gig-dark-button gig-detail-apply-button"
+                                    disabled={
+                                        checkingApplication ||
+                                        hasApplied ||
+                                        isCancelled ||
+                                        gig.status !== 'OPEN'
+                                    }
+                                    onClick={() => setShowApplyModal(true)}
+                                >
+                                    {checkingApplication
+                                        ? 'Checking...'
+                                        : isCancelled
+                                        ? 'Gig Cancelled'
+                                        : hasApplied
+                                        ? 'Applied'
+                                        : gig.status === 'OPEN'
+                                        ? 'Apply Now'
+                                        : gig.status}
+                                </button>
+                            )}
+
 
                         </section>
 
@@ -512,6 +586,7 @@ function GigDetailPage() {
                     onClose={() => setShowApplyModal(false)}
                     onSuccess={() => {
                         setShowApplyModal(false);
+                        setHasApplied(true);
 
                         setGig((currentGig) => ({
                             ...currentGig,

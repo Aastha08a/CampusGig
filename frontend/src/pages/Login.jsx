@@ -3,6 +3,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../services/authApi';
 import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
+
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+import api from '../services/api';
 
 function Login() {
     const navigate = useNavigate();
@@ -31,6 +35,25 @@ function Login() {
             navigate('/dashboard');
         } catch (error) {
             setError(error.message);
+        }
+    };
+
+    const handleGoogleSuccess = async (response) => {
+        try {
+            setError('');
+
+            const result = await api.post('/auth/google', {
+                credential: response.credential,
+            });
+
+            login(result.data.user, result.data.accessToken);
+
+            navigate('/dashboard');
+        } catch (error) {
+            setError(
+                error.response?.data?.message ||
+                'Google login failed. Please try again.'
+            );
         }
     };
 
@@ -119,12 +142,12 @@ function Login() {
                                         Password
                                     </label>
 
-                                    <button
-                                        type="button"
+                                    <Link
+                                        to="/forgot-password"
                                         className="forgot-password"
                                     >
                                         Forgot password?
-                                    </button>
+                                    </Link>
 
                                 </div>
 
@@ -158,15 +181,28 @@ function Login() {
                         </div>
 
 
-                        <button className="google-button">
-                            <span>G</span>
-                            Continue with Google
-                        </button>
+                        <div className="google-login-wrapper">
+                            <GoogleOAuthProvider
+                                clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
+                            >
+                                <GoogleLogin
+                                    onSuccess={handleGoogleSuccess}
+                                    onError={() => {
+                                        setError('Google sign-in failed. Please try again.');
+                                    }}
+                                    text="continue_with"
+                                    shape="rectangular"
+                                    theme="outline"
+                                    size="large"
+                                    width="100%"
+                                />
+                            </GoogleOAuthProvider>
+                        </div>
 
 
                         <p className="signup-text">
                             Don't have an account?
-                            <a href="/signup"> Sign Up</a>
+                            <Link to="/signup"> Sign Up</Link>
                         </p>
 
                     </div>

@@ -23,6 +23,8 @@ model User {
   updatedAt     DateTime @updatedAt
   otp_code      String?
   otp_expires_at DateTime?
+  reset_otp_code       String?
+  reset_otp_expires_at DateTime?
 
   skills          UserSkill[]
   gigs            Gig[]
@@ -57,6 +59,7 @@ model Gig {
   title       String
   description String
   budget      Float
+  spots       Int @default(1)
 
   category    GigCategory?
   dueDate     DateTime?

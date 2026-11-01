@@ -15,12 +15,19 @@ const router = express.Router();
 
 const {
   createApplicationController,
+  getGigApplicationsController,
 } = require("../controllers/applicationController");
 
 router.post(
   "/:id/applications",
   authGuard,
   createApplicationController
+);
+
+router.get(
+  "/:id/applications",
+  authGuard,
+  getGigApplicationsController
 );
 
 router.get("/my", authGuard, getMyGigsController);

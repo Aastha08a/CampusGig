@@ -185,22 +185,21 @@ async function updateMyProfile(userId, data) {
   return user;
 }
 
+
 async function getPublicProfile(userId) {
   const user = await prisma.user.findUnique({
     where: {
       id: userId,
     },
-
     select: {
       id: true,
       name: true,
       bio: true,
-
       university: true,
       stream: true,
       year: true,
       city: true,
-
+      createdAt: true,
       skills: {
         include: {
           skill: true,
@@ -210,24 +209,83 @@ async function getPublicProfile(userId) {
   });
 
   if (!user) {
-    throw new Error("User not found.");
+    const error = new Error("User not found.");
+    error.statusCode = 404;
+    throw error;
   }
+
+  const postedGigs = await prisma.gig.count({
+    where: { postedById: userId },
+  });
+
+  const completedGigs = await prisma.gig.count({
+    where: {
+      postedById: userId,
+      status: "COMPLETED",
+    },
+  });
+
+  const ratingStats = await prisma.rating.aggregate({
+    where: { ratedId: userId },
+    _avg: { score: true },
+    _count: { _all: true },
+  });
+
+  const recentGigs = await prisma.gig.findMany({
+    where: { postedById: userId },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+    select: {
+      id: true,
+      title: true,
+      budget: true,
+      status: true,
+      createdAt: true,
+    },
+  });
+
+  const reviews = await prisma.rating.findMany({
+    where: { ratedId: userId },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+    select: {
+      id: true,
+      score: true,
+      review: true,
+      createdAt: true,
+      rater: {
+        select: { name: true },
+      },
+    },
+  });
 
   return {
     id: user.id,
     name: user.name,
     bio: user.bio,
-
     university: user.university,
     stream: user.stream,
     year: user.year,
     city: user.city,
-
-    skills: user.skills.map(
-      (userSkill) => userSkill.skill
-    ),
+    createdAt: user.createdAt,
+    skills: user.skills.map((item) => item.skill),
+    stats: {
+      postedGigs,
+      completedGigs,
+      rating: ratingStats._avg.score,
+      reviewCount: ratingStats._count._all,
+    },
+    recentGigs,
+    reviews: reviews.map((review) => ({
+      id: review.id,
+      score: review.score,
+      review: review.review,
+      createdAt: review.createdAt,
+      raterName: review.rater.name,
+    })),
   };
 }
+
 
 async function addSkills(userId, skillIds) {
     if (!Array.isArray(skillIds)) {

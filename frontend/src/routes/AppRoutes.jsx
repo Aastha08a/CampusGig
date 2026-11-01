@@ -19,17 +19,21 @@ import GigDetailPage from '../pages/GigDetailPage';
 import BrowseGigsPage from '../pages/BrowseGigsPage';
 
 import MyApplicationsPage from '../pages/MyApplicationsPage';
+import GigApplicantsPage from '../pages/GigApplicantsPage';
+
+import ForgotPassword from '../pages/ForgotPassword';
+
+
 
 function PublicRoute({ children }) {
-    const { user } = useAuth();
+    const { user, loading } = useAuth();
 
-    if (user) {
-        return <Navigate to="/dashboard" replace />;
+    if (loading) {
+        return <p>Loading...</p>;
     }
 
     return children;
 }
-
 
 function AppRoutes() {
     return (
@@ -55,6 +59,15 @@ function AppRoutes() {
                 element={
                     <PublicRoute>
                         <SignupPage />
+                    </PublicRoute>
+                }
+            />
+
+            <Route
+                path="/forgot-password"
+                element={
+                    <PublicRoute>
+                        <ForgotPassword />
                     </PublicRoute>
                 }
             />
@@ -105,6 +118,10 @@ function AppRoutes() {
                 <Route
                     path="/my-applications"
                     element={<MyApplicationsPage />}
+                />
+                <Route
+                    path="/gigs/:id/applications"
+                    element={<GigApplicantsPage />}
                 />
             </Route>
 
