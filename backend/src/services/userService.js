@@ -186,11 +186,10 @@ async function updateMyProfile(userId, data) {
 }
 
 
+
 async function getPublicProfile(userId) {
   const user = await prisma.user.findUnique({
-    where: {
-      id: userId,
-    },
+    where: { id: userId },
     select: {
       id: true,
       name: true,
@@ -244,17 +243,19 @@ async function getPublicProfile(userId) {
     },
   });
 
+  // Fetch ALL reviews instead of only the latest three
   const reviews = await prisma.rating.findMany({
     where: { ratedId: userId },
     orderBy: { createdAt: "desc" },
-    take: 3,
     select: {
       id: true,
       score: true,
       review: true,
       createdAt: true,
       rater: {
-        select: { name: true },
+        select: {
+          name: true,
+        },
       },
     },
   });
@@ -268,14 +269,18 @@ async function getPublicProfile(userId) {
     year: user.year,
     city: user.city,
     createdAt: user.createdAt,
+
     skills: user.skills.map((item) => item.skill),
+
     stats: {
       postedGigs,
       completedGigs,
       rating: ratingStats._avg.score,
       reviewCount: ratingStats._count._all,
     },
+
     recentGigs,
+
     reviews: reviews.map((review) => ({
       id: review.id,
       score: review.score,
