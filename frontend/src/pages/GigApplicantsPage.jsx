@@ -34,12 +34,16 @@ function GigApplicantsPage() {
 
             setGig(data.gig);
             setApplications(data.applications);
+
+            return data;
         } catch (error) {
             console.error(error);
             setError(
                 error.response?.data?.message ||
                 'Failed to load applicants.'
             );
+
+            return null;
         } finally {
             setLoading(false);
         }
@@ -55,27 +59,41 @@ function GigApplicantsPage() {
             setError('');
             setSuccess('');
 
-            const updatedApplication = await updateApplicationStatus(
-                applicationId,
-                status
-            );
+            const rejectedCountBefore = applications.filter(
+                (application) => application.status === 'REJECTED'
+            ).length;
 
-            setApplications((current) =>
-                current.map((application) =>
-                    application.id === applicationId
-                        ? { ...application, ...updatedApplication }
-                        : application
-                )
-            );
+            await updateApplicationStatus(applicationId, status);
 
-            setSuccess(
-                status === 'ACCEPTED'
-                    ? 'Applicant accepted successfully.'
-                    : 'Applicant rejected successfully.'
-            );
+            // Refresh applications to capture automatic rejections.
+            const refreshedData = await loadApplications();
 
-            // Refresh to reflect automatic rejections and gig status changes.
-            await loadApplications();
+            if (status === 'ACCEPTED' && refreshedData) {
+                const rejectedCountAfter = refreshedData.applications.filter(
+                    (application) => application.status === 'REJECTED'
+                ).length;
+
+                const automaticallyRejected =
+                    rejectedCountAfter - rejectedCountBefore;
+
+                if (automaticallyRejected > 0) {
+                    setSuccess(
+                        `Applicant accepted successfully. ${automaticallyRejected} other ${
+                            automaticallyRejected === 1
+                                ? 'applicant was'
+                                : 'applicants were'
+                        } automatically rejected because all positions are filled.`
+                    );
+                } else {
+                    setSuccess('Applicant accepted successfully.');
+                }
+            } else {
+                setSuccess(
+                    status === 'ACCEPTED'
+                        ? 'Applicant accepted successfully.'
+                        : 'Applicant rejected successfully.'
+                );
+            }
         } catch (error) {
             console.error(error);
             setError(
@@ -197,6 +215,19 @@ function GigApplicantsPage() {
                                 .map((item) => item.skill?.name)
                                 .filter(Boolean);
 
+                                
+                            const ratings = applicant?.receivedRatings || [];
+
+                            const averageRating = ratings.length
+                                ? (
+                                    ratings.reduce((total, rating) => total + rating.score, 0) /
+                                    ratings.length
+                                ).toFixed(1)
+                                : null;
+
+                            const visibleSkills = skillNames.slice(0, 4);
+                            const remainingSkills = skillNames.length - visibleSkills.length;
+
                             const isPending = application.status === 'PENDING';
                             const isUpdating = updatingId === application.id;
 
@@ -220,28 +251,52 @@ function GigApplicantsPage() {
                                         </span>
                                     </div>
 
-                                    <h2>
-                                        {applicant?.name || 'Unknown applicant'}
-                                    </h2>
+                                    <div className="applicant-name-row">
+                                        <h2>
+                                            {applicant?.name || 'Unknown applicant'}
+                                        </h2>
 
-                                    {/* <p>
-                                        {applicant?.university || 'University not provided'}
-                                    </p> */}
+                                        <div className="applicant-rating">
+                                            {averageRating ? (
+                                                <>
+                                                    <span className="rating-star">★</span>
+                                                    <strong>{averageRating}</strong>
+                                                    <span className="rating-count">
+                                                        ({ratings.length})
+                                                    </span>
+                                                </>
+                                            ) : (
+                                                <span className="no-rating">No ratings yet</span>
+                                            )}
+                                        </div>
+                                    </div>
 
-                                    {applicant?.bio && (
-                                        <p className="applicant-bio">
-                                            {applicant.bio}
-                                        </p>
-                                    )}
+                                    <p className="applicant-bio">
+                                        {applicant?.bio || 'No bio added yet.'}
+                                    </p>
+
+                                    <div className="applicant-skills">
+                                        {visibleSkills.map((skill, index) => (
+                                            <span key={`${skill}-${index}`}>{skill}</span>
+                                        ))}
+
+                                        {remainingSkills > 0 && (
+                                            <span className="more-skills">+{remainingSkills}</span>
+                                        )}
+
+                                        {skillNames.length === 0 && (
+                                            <span>No skills added</span>
+                                        )}
+                                    </div>
 
                                     <div className="application-details">
-                                      <span>
-                                          Applied{' '}
-                                          {new Date(application.createdAt).toLocaleDateString('en-IN', {
-                                              day: 'numeric',
-                                              month: 'short',
-                                          })}
-                                      </span>
+                                        <span>
+                                            Applied{' '}
+                                            {new Date(application.createdAt).toLocaleDateString('en-IN', {
+                                                day: 'numeric',
+                                                month: 'short',
+                                            })}
+                                        </span>
                                     </div>
 
                                     <div className="applicant-card-actions">

@@ -128,7 +128,7 @@ function MyGigsPage() {
 
     const totalApplicants = gigs.reduce(
         (total, gig) =>
-            total + (gig.applications?.length || 0),
+            total + (gig._count?.applications || 0),
         0
     );
 

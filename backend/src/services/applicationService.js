@@ -19,6 +19,29 @@ async function createApplication(gigId, applicantId, pitchMessage) {
     throw new Error("This gig is no longer open for applications.");
   }
 
+  if (gig.dueDate) {
+    const deadline = gig.dueDate;
+
+    // Get the selected calendar date from the stored UTC date.
+    const year = deadline.getUTCFullYear();
+    const month = deadline.getUTCMonth();
+    const day = deadline.getUTCDate();
+
+    // Applications close at 12:00 AM IST on the following day.
+    const deadlineEnd = new Date(
+      Date.UTC(year, month, day + 1) - (5.5 * 60 * 60 * 1000)
+    );
+
+    if (new Date() >= deadlineEnd) {
+      const error = new Error(
+        "The application deadline for this gig has passed."
+      );
+
+      error.statusCode = 400;
+      throw error;
+    }
+  }
+
   if (gig.postedById === applicantId) {
     const error = new Error(
       "You cannot apply to your own gig."
@@ -166,6 +189,7 @@ async function getGigApplications(gigId, userId) {
   };
 }
 
+
 async function updateApplicationStatus(applicationId, userId, status) {
   if (!["ACCEPTED", "REJECTED"].includes(status)) {
     const error = new Error("Invalid application status.");
@@ -174,13 +198,30 @@ async function updateApplicationStatus(applicationId, userId, status) {
   }
 
   return prisma.$transaction(async (tx) => {
+    // Find the gig associated with this application.
+    const initialApplication = await tx.application.findUnique({
+      where: { id: applicationId },
+      select: { gigId: true },
+    });
+
+    if (!initialApplication) {
+      const error = new Error("Application not found.");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    // Lock the gig row so decisions for this gig run one at a time.
+    await tx.$queryRaw`
+      SELECT "id"
+      FROM "Gig"
+      WHERE "id" = ${initialApplication.gigId}
+      FOR UPDATE
+    `;
+
+    // Fetch fresh application data after acquiring the lock.
     const application = await tx.application.findUnique({
-      where: {
-        id: applicationId,
-      },
-      include: {
-        gig: true,
-      },
+      where: { id: applicationId },
+      include: { gig: true },
     });
 
     if (!application) {
@@ -233,12 +274,8 @@ async function updateApplicationStatus(applicationId, userId, status) {
     }
 
     const updatedApplication = await tx.application.update({
-      where: {
-        id: applicationId,
-      },
-      data: {
-        status,
-      },
+      where: { id: applicationId },
+      data: { status },
     });
 
     if (status === "ACCEPTED") {
@@ -251,12 +288,8 @@ async function updateApplicationStatus(applicationId, userId, status) {
 
       if (acceptedCount >= gig.spots) {
         await tx.gig.update({
-          where: {
-            id: gig.id,
-          },
-          data: {
-            status: "IN_PROGRESS",
-          },
+          where: { id: gig.id },
+          data: { status: "IN_PROGRESS" },
         });
 
         await tx.application.updateMany({
@@ -264,9 +297,7 @@ async function updateApplicationStatus(applicationId, userId, status) {
             gigId: gig.id,
             status: "PENDING",
           },
-          data: {
-            status: "REJECTED",
-          },
+          data: { status: "REJECTED" },
         });
       }
     }
@@ -274,6 +305,8 @@ async function updateApplicationStatus(applicationId, userId, status) {
     return updatedApplication;
   });
 }
+
+
 
 async function withdrawApplication(applicationId, userId) {
   const application = await prisma.application.findUnique({

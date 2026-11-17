@@ -1,5 +1,27 @@
 const prisma = require("../lib/prisma");
 
+function validateDueDate(dueDate) {
+  if (!dueDate) return;
+
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+
+  const today = `${parts.find(p => p.type === "year").value}-${parts.find(p => p.type === "month").value}-${parts.find(p => p.type === "day").value}`;
+
+  const selectedDate = String(dueDate).slice(0, 10);
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(selectedDate) ||
+      selectedDate < today) {
+    throw new Error(
+      "Application deadline cannot be in the past."
+    );
+  }
+}
+
 async function createGig(userId, data) {
   const {
     title,
@@ -42,6 +64,8 @@ async function createGig(userId, data) {
       throw new Error("One or more skill IDs are invalid.");
     }
   }
+
+  validateDueDate(dueDate);
 
   const gig = await prisma.gig.create({
     data: {
@@ -164,13 +188,43 @@ async function getAllGigs(filters = {}, currentUserId) {
     sort = "latest",
   } = filters;
 
+  // Get today's date in IST.
+  const istParts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+
+  const dateParts = Object.fromEntries(
+    istParts.map(({ type, value }) => [type, value])
+  );
+
+  // Gig dueDate is stored as UTC midnight for its selected calendar date.
+  const todayInIST = new Date(
+    Date.UTC(
+      Number(dateParts.year),
+      Number(dateParts.month) - 1,
+      Number(dateParts.day)
+    )
+  );
+
   const where = {
     status: "OPEN",
 
+    AND: [
+      {
+        OR: [
+          { dueDate: null },
+          { dueDate: { gte: todayInIST } },
+        ],
+      },
+    ],
+
     ...(currentUserId && {
-        postedById: {
-            not: currentUserId,
-        },
+      postedById: {
+        not: currentUserId,
+      },
     }),
   };
 
@@ -325,6 +379,8 @@ async function updateGig(gigId, userId, data) {
   }
 
   if (data.dueDate !== undefined) {
+    validateDueDate(data.dueDate);
+
     updateData.dueDate = data.dueDate
       ? new Date(data.dueDate)
       : null;

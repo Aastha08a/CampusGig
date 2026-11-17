@@ -93,6 +93,25 @@ function getStatusClass(status) {
     return 'gig-status-progress';
 }
 
+function formatDuration(duration) {
+    if (!duration) return 'Not specified';
+
+    const value = duration.trim();
+
+    // If only a number is entered, assume days
+    if (/^\d+$/.test(value)) {
+        return `${value} ${Number(value) === 1 ? 'day' : 'days'}`;
+    }
+
+    // Correct singular/plural for days, weeks and months
+    return value.replace(
+        /\b(\d+)\s+(day|week|month)s?\b/gi,
+        (match, number, unit) => {
+            return `${number} ${unit}${Number(number) === 1 ? '' : 's'}`;
+        }
+    );
+}
+
 function GigDetailPage() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -233,6 +252,22 @@ function GigDetailPage() {
 
     const isCancelled =
         gig.status === 'CANCELLED';
+    
+    const isDeadlinePassed = (() => {
+        if (!gig.dueDate) return false;
+
+        const date = new Date(gig.dueDate);
+
+        const deadlineEnd = new Date(
+            Date.UTC(
+                date.getUTCFullYear(),
+                date.getUTCMonth(),
+                date.getUTCDate() + 1
+            ) - (5.5 * 60 * 60 * 1000)
+        );
+
+        return new Date() >= deadlineEnd;
+    })();
 
     return (
         <div className="gig-page">
@@ -308,6 +343,14 @@ function GigDetailPage() {
                                     className="gig-detail-meta-icon"
                                 />
                                 Deadline: {formatShortDate(gig.dueDate)}
+                            </span>
+
+                            <span>
+                                <FontAwesomeIcon
+                                    icon={faUserGroup}
+                                    className="gig-detail-meta-icon"
+                                />
+                                {gig.spots} people needed
                             </span>
 
                             <span>
@@ -454,7 +497,7 @@ function GigDetailPage() {
                                     </span>
 
                                     <strong>
-                                        {gig.duration || 'Not specified'}
+                                        {formatDuration(gig.duration)}
                                     </strong>
                                 </div>
 
@@ -469,6 +512,15 @@ function GigDetailPage() {
                                     </strong>
                                 </div>
 
+                                <div>
+                                    <span>
+                                        People needed
+                                    </span>
+
+                                    <strong>
+                                        {gig.spots}
+                                    </strong>
+                                </div>
 
                                 <div>
                                     <span>
@@ -498,6 +550,7 @@ function GigDetailPage() {
                                         checkingApplication ||
                                         hasApplied ||
                                         isCancelled ||
+                                        isDeadlinePassed ||
                                         gig.status !== 'OPEN'
                                     }
                                     onClick={() => setShowApplyModal(true)}
@@ -506,6 +559,8 @@ function GigDetailPage() {
                                         ? 'Checking...'
                                         : isCancelled
                                         ? 'Gig Cancelled'
+                                        : isDeadlinePassed
+                                        ? 'Applications Closed'
                                         : hasApplied
                                         ? 'Applied'
                                         : gig.status === 'OPEN'

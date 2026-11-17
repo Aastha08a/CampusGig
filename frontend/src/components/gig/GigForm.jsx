@@ -92,6 +92,15 @@ function GigForm({
     const [loading, setLoading] = useState(false);
     const [skillsLoading, setSkillsLoading] = useState(true);
 
+    const todayParts = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Asia/Kolkata',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+    }).formatToParts(new Date());
+
+    const todayInIST = `${todayParts.find(p => p.type === 'year').value}-${todayParts.find(p => p.type === 'month').value}-${todayParts.find(p => p.type === 'day').value}`;
+
     useEffect(() => {
         async function loadSkills() {
             try {
@@ -506,6 +515,7 @@ function GigForm({
                         <input
                             id="gig-due-date"
                             type="date"
+                            min={todayInIST}
                             value={dueDate}
                             onChange={(e) =>
                                 setDueDate(e.target.value)

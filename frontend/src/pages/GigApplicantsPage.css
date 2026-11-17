@@ -1,43 +1,133 @@
 
 /* GIG APPLICANTS */
 
-.applicant-bio {
-    margin: 12px 0 0;
-    color: #777;
-    font-size: 14px;
-    line-height: 1.5;
-    overflow-wrap: anywhere;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 4;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    min-height: calc(1.5em * 4);
-}
-
-.applicant-skills {
+/* Applicant card layout */
+.application-card {
+    height: 520px;
+    min-height: 520px;
+    box-sizing: border-box;
     display: flex;
-    flex-wrap: wrap;
-    gap: 7px;
-    margin-top: 16px;
+    flex-direction: column;
+    padding-bottom: 18px;
 }
 
-.applicant-skills span {
-    padding: 6px 10px;
-    border: 1px solid #eee8df;
-    border-radius: 16px;
-    background: #faf9f7;
-    color: #666;
+/* Name and rating */
+.applicant-name-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.applicant-name-row h2 {
+    margin: 0;
+    min-width: 0;
+}
+
+.applicant-rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+    font-size: 16px;
+}
+
+.rating-star {
+    color: #ffc342;
+    font-size: 20px;
+}
+
+.applicant-rating strong {
+    font-weight: 500;
+}
+
+.rating-count {
+    color: #888;
     font-size: 12px;
 }
 
+.no-rating {
+    color: #999;
+    font-size: 12px;
+}
+
+/* Bio: exactly 2 lines */
+.application-card .applicant-bio {
+    margin: 14px 0 0;
+    color: #777;
+    font-size: 14px;
+    line-height: 1.6;
+
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    overflow-wrap: anywhere;
+
+    min-height: calc(1.6em * 2);
+    max-height: calc(1.6em * 2);
+}
+
+/* Skills */
+.applicant-skills {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 7px;
+    margin-top: 12px;
+
+    min-height: 58px;
+    max-height: 58px;
+    overflow: hidden;
+}
+
+.applicant-skills span {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 6px 11px;
+    border: 1px solid #eee8df;
+    border-radius: 18px;
+
+    background: #faf9f7;
+    color: #666;
+
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.applicant-skills .more-skills {
+    background: #fff1d0;
+    border-color: #ffdf91;
+    color: #956c16;
+    font-weight: 600;
+}
+
+/* Application date */
+.application-card .application-details {
+    margin-top: 12px;
+    padding-top: 18px;
+    border-top: 1px solid #eee8df;
+    flex-shrink: 0;
+}
+
+.application-details span {
+    color: #292621;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+/* Action buttons */
 .applicant-card-actions {
     display: flex;
     flex-direction: column;
     gap: 10px;
+
     margin-top: auto;
-    padding-top: 24px;
+    padding-top: 20px;
     flex-shrink: 0;
 }
 
@@ -57,10 +147,12 @@
     min-width: 0;
     min-height: 44px;
     padding: 11px 12px;
+
     border-radius: 11px;
     font-family: inherit;
     font-size: 14px;
     font-weight: 600;
+
     cursor: pointer;
     transition: background 0.2s ease, border-color 0.2s ease;
 }
@@ -91,28 +183,51 @@
     cursor: not-allowed;
 }
 
-/* Keep applicant cards consistent in size */
-.applicant-card {
-    height: 490px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    box-sizing: border-box;
+.application-card .applicant-name-row {
+    margin-top: 6px;
 }
 
-/* Limit long bios to a fixed number of lines */
-.applicant-card .applicant-bio {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 4;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 1.6;
-    min-height: calc(1.6em * 4);
+.application-card .applicant-name-row h2 {
+    margin: 0;
 }
 
-/* Keep the action buttons at the bottom */
-.applicant-card .application-actions {
+.application-card .applicant-skills {
+    min-height: 76px;
+    max-height: 76px;
+    margin-top: 12px;
+    overflow: hidden;
+    align-content: flex-start;
+}
+
+/* Keep application date below skills */
+.application-card .application-details {
+    margin-top: 10px;
+    flex-shrink: 0;
+}
+
+/* Actions stay at the bottom for BOTH card states */
+.application-card .applicant-card-actions {
     margin-top: auto;
+    padding-top: 18px;
+    flex-shrink: 0;
 }
 
+/* Keep decision buttons comfortably inside the card */
+.application-card .applicant-decision-actions {
+    margin-bottom: 2px;
+}
+
+/* Responsive */
+@media (max-width: 560px) {
+    .application-card {
+        height: 490px;
+    }
+
+    .applicant-name-row h2 {
+        font-size: 20px;
+    }
+
+    .applicant-rating {
+        font-size: 14px;
+    }
+}
