@@ -439,63 +439,6 @@ async function updateGig(gigId, userId, data) {
 }
 
 
-async function completeGig(gigId, userId) {
-  const gig = await prisma.gig.findUnique({
-    where: { id: gigId },
-    include: {
-      applications: {
-        where: {
-          applicantId: userId,
-          status: "ACCEPTED",
-        },
-        select: { id: true },
-      },
-    },
-  });
-
-  if (!gig) {
-    const error = new Error("Gig not found.");
-    error.statusCode = 404;
-    throw error;
-  }
-
-  const isCreator = gig.postedById === userId;
-  const isAcceptedApplicant = gig.applications.length > 0;
-
-  if (!isCreator && !isAcceptedApplicant) {
-    const error = new Error(
-      "Only the gig creator or an accepted applicant can complete this gig."
-    );
-    error.statusCode = 403;
-    throw error;
-  }
-
-  if (gig.status !== "IN_PROGRESS") {
-    const error = new Error(
-      "Only gigs in progress can be marked as complete."
-    );
-    error.statusCode = 400;
-    throw error;
-  }
-
-  return prisma.gig.update({
-    where: { id: gigId },
-    data: { status: "COMPLETED" },
-    include: {
-      skills: { include: { skill: true } },
-      postedBy: {
-        select: {
-          id: true,
-          name: true,
-          university: true,
-        },
-      },
-      _count: { select: { applications: true } },
-    },
-  });
-}
-
-
 async function deleteGig(gigId, userId) {
   const gig = await prisma.gig.findUnique({
     where: {
@@ -538,5 +481,4 @@ module.exports = {
   getAllGigs,
   updateGig,
   deleteGig,
-  completeGig,
 };
