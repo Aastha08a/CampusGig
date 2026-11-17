@@ -10,6 +10,11 @@ export async function getGig(gigId) {
     return response.data;
 }
 
+export async function completeGig(gigId) {
+    const response = await api.post(`/gigs/${gigId}/complete`);
+    return response.data;
+}
+
 export async function updateGig(gigId, data) {
     const response = await api.patch(`/gigs/${gigId}`, data);
     return response.data;
