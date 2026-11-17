@@ -7,7 +7,6 @@ const {
   deleteGigController,
   getMyGigsController,
   getAllGigsController,
-  completeGigController,
 } = require("../controllers/gigController");
 
 const authGuard = require("../middleware/authGuard");
@@ -38,12 +37,6 @@ router.post("/", authGuard, createGigController);
 router.get("/", authGuard, getAllGigsController);
 
 router.get("/:id", authGuard, getGig);
-
-router.post(
-  "/:id/complete",
-  authGuard,
-  completeGigController
-);
 
 router.patch("/:id", authGuard, updateGigController);
 
