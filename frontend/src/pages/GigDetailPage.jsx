@@ -2,7 +2,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 
 import Navbar from '../components/home/Navbar';
-import { getGig, completeGig } from '../services/gigApi';
+import { getGig } from '../services/gigApi';
 
 import './gigDetail.css';
 
@@ -159,7 +159,7 @@ function GigDetailPage() {
                     ? data
                     : data?.applications ?? data?.data ?? [];
 
-                const currentGigApplications = applications.filter((application) => {
+                const alreadyApplied = applications.some((application) => {
                     const applicationGigId =
                         application.gigId ??
                         application.gig?.id ??
@@ -168,14 +168,8 @@ function GigDetailPage() {
                     return String(applicationGigId) === String(id);
                 });
 
-                const alreadyApplied = currentGigApplications.length > 0;
-                const accepted = currentGigApplications.some(
-                    (application) => application.status === 'ACCEPTED'
-                );
-
                 if (!cancelled) {
                     setHasApplied(alreadyApplied);
-                    setIsAcceptedApplicant(accepted);
                 }
             } catch (error) {
                 console.error('Failed to check application status:', error);
@@ -261,27 +255,6 @@ function GigDetailPage() {
     const isCancelled =
         gig.status === 'CANCELLED';
 
-    const canComplete =
-        gig.status === 'IN_PROGRESS' &&
-        (isOwner || isAcceptedApplicant);
-
-    async function handleCompleteGig() {
-        setCompleting(true);
-        setError('');
-
-        try {
-            const updatedGig = await completeGig(gig.id);
-            setGig(updatedGig);
-        } catch (error) {
-            setError(
-                error.response?.data?.message ||
-                'Failed to mark the gig as complete.'
-            );
-        } finally {
-            setCompleting(false);
-        }
-    }
-    
     const isDeadlinePassed = (() => {
         if (!gig.dueDate) return false;
 
@@ -565,17 +538,7 @@ function GigDetailPage() {
 
 
                             
-                            {canComplete ? (
-                                <button
-                                    className="gig-dark-button gig-detail-apply-button"
-                                    onClick={handleCompleteGig}
-                                    disabled={completing}
-                                >
-                                    {completing
-                                        ? 'Completing...'
-                                        : 'Mark as Complete'}
-                                </button>
-                            ) : isOwner ? (
+                            {isOwner ? (
                                 <button
                                     className="gig-dark-button gig-detail-apply-button"
                                     onClick={() => navigate(`/gigs/${gig.id}/applications`)}
