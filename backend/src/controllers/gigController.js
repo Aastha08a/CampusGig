@@ -5,6 +5,7 @@ const {
   deleteGig,
   getMyGigs,
   getAllGigs,
+  completeGig,
 } = require("../services/gigService");
 
 async function createGigController(req, res) {
@@ -62,6 +63,18 @@ async function deleteGigController(req, res) {
   }
 }
 
+async function completeGigController(req, res) {
+  try {
+    const gig = await completeGig(req.params.id, req.user.userId);
+    res.status(200).json(gig);
+  } catch (error) {
+    res.status(error.statusCode || 400).json({
+      message: error.message,
+    });
+  }
+}
+
+
 async function getMyGigsController(req, res) {
   try {
     const gigs = await getMyGigs(req.user.userId);
@@ -96,4 +109,5 @@ module.exports = {
   deleteGigController,
   getMyGigsController,
   getAllGigsController,
+  completeGigController,
 };
